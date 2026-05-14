@@ -9,6 +9,8 @@ import {
   Typography,
   Box,
   Grid,
+  Avatar,
+  Stack,
 } from '@mui/material';
 import { Notification } from '@/lib/api';
 import { getTypeColor, getTypeLabel } from '@/lib/priority';
@@ -43,6 +45,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
   const date = new Date(notification.Timestamp);
   const typeColor = getTypeColor(notification.Type);
   const isNew = !isViewed;
+  const initials = notification.Type.slice(0, 1).toUpperCase();
 
   return (
     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -52,59 +55,107 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          cursor: isNew ? 'pointer' : 'default',
-          opacity: isNew ? 1 : 0.85,
-          border: isNew ? '2px solid' : '1px solid',
-          borderColor: isNew ? 'primary.main' : 'divider',
-          backgroundColor: isNew ? 'rgba(25, 103, 210, 0.05)' : 'background.paper',
-          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+          position: 'relative',
+          overflow: 'hidden',
+          border: '1px solid rgba(15, 76, 129, 0.1)',
+          background:
+            isNew
+              ? 'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,246,252,0.92))'
+              : 'linear-gradient(180deg, rgba(255,255,255,0.92), rgba(247,249,252,0.84))',
+          transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+          boxShadow: isNew ? '0 18px 40px rgba(15, 76, 129, 0.14)' : '0 10px 28px rgba(15, 31, 45, 0.08)',
           '&:hover': {
-            boxShadow: 3,
-            transform: 'translateY(-4px)',
+            transform: 'translateY(-6px)',
+            borderColor: 'rgba(15, 76, 129, 0.28)',
+            boxShadow: '0 24px 50px rgba(15, 76, 129, 0.16)',
+          },
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background: isNew
+              ? 'linear-gradient(135deg, rgba(15,76,129,0.1), rgba(197,139,44,0.05))'
+              : 'linear-gradient(135deg, rgba(15,76,129,0.04), rgba(255,255,255,0))',
+            pointerEvents: 'none',
           },
         }}
       >
         <CardHeader
-          title={getTypeLabel(notification.Type)}
-          subheader={date.toLocaleString()}
-          action={
-            <Chip
-              label={isNew ? 'New' : 'Viewed'}
-              color={isNew ? 'primary' : 'default'}
-              size="small"
-              variant={isNew ? 'filled' : 'outlined'}
-            />
+          avatar={
+            <Avatar
+              sx={{
+                bgcolor: isNew ? 'primary.main' : 'rgba(15,76,129,0.12)',
+                color: isNew ? '#fff' : 'primary.main',
+                fontWeight: 800,
+              }}
+            >
+              {initials}
+            </Avatar>
           }
-          sx={{
-            backgroundColor: isNew ? 'rgba(25, 103, 210, 0.1)' : 'transparent',
-          }}
-        />
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Typography
-            variant="body2"
-            color="text.primary"
-            sx={{
-              lineHeight: 1.6,
-              wordBreak: 'break-word',
-            }}
-          >
-            {notification.Message}
-          </Typography>
-          <Box sx={{ marginTop: 2 }}>
+          title={
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                {getTypeLabel(notification.Type)}
+              </Typography>
+              <Chip
+                label={isNew ? 'New' : 'Viewed'}
+                color={isNew ? 'primary' : 'default'}
+                size="small"
+                variant={isNew ? 'filled' : 'outlined'}
+                sx={{ fontWeight: 700 }}
+              />
+            </Stack>
+          }
+          subheader={
+            <Typography variant="caption" color="text.secondary">
+              {date.toLocaleString()}
+            </Typography>
+          }
+          action={
             <Chip
               label={notification.Type}
               color={typeColor}
               size="small"
               variant="outlined"
+              sx={{ fontWeight: 700 }}
             />
-          </Box>
+          }
+          sx={{
+            pb: 1,
+            '& .MuiCardHeader-content': { minWidth: 0 },
+          }}
+        />
+        <CardContent sx={{ flexGrow: 1, pt: 0 }}>
           <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', marginTop: 1 }}
+            variant="body1"
+            color="text.primary"
+            sx={{
+              lineHeight: 1.75,
+              wordBreak: 'break-word',
+              minHeight: 64,
+            }}
           >
-            ID: {notification.ID.substring(0, 8)}...
+            {notification.Message}
           </Typography>
+          <Box
+            sx={{
+              mt: 2.5,
+              pt: 1.75,
+              borderTop: '1px solid rgba(15, 76, 129, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 2,
+            }}
+          >
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+              ID: {notification.ID.substring(0, 8)}...
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {isNew ? 'Fresh notification' : 'Already viewed'}
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
     </Grid>
