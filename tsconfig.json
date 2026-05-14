@@ -23,6 +23,7 @@
     }
   },
   "include": [
+  "logging_middleware/**/*",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
